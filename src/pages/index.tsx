@@ -9,6 +9,8 @@ type FormData = {
   eventPayload: string
 }
 
+declare const window: Window & { _mtm: any };
+
 export default function Home() {
   const [eventName, setEventName] = useState('')
   const [eventPayload, setEventPayload] = useState('')
@@ -18,6 +20,7 @@ export default function Home() {
     formData: FormData
   ) => {
     event.preventDefault()
+    
     if (window && window._mtm) {
       window._mtm = window._mtm || [];
       window._mtm.push({'event': formData.eventName, ...JSON.parse(eventPayload)});

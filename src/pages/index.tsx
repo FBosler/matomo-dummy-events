@@ -11,6 +11,8 @@ type FormData = {
 
 declare const window: Window & { _mtm: any };
 
+const CONTAINER_URL = "https://cdn.matomo.cloud/clinlife.matomo.cloud/container_kIEjXUNc.js"
+
 export default function Home() {
   const [eventName, setEventName] = useState('')
   const [eventPayload, setEventPayload] = useState('')
@@ -36,7 +38,7 @@ export default function Home() {
           var _mtm = window._mtm = window._mtm || [];
           _mtm.push({'mtm.startTime': (new Date().getTime()), 'event': 'mtm.Start'});
           var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-          g.async=true; g.src='https://cdn.matomo.cloud/clinlife.matomo.cloud/container_kIEjXUNc.js'; s.parentNode.insertBefore(g,s);
+          g.async=true; g.src='${CONTAINER_URL}'; s.parentNode.insertBefore(g,s);
       `}
       </Script>
       <main
@@ -52,7 +54,10 @@ export default function Home() {
               </h2>
               <p className="mt-2 text-sm leading-6 text-white-600">
                 This will be used as the name of the event to identify it in Tag
-                Manager
+                Manager. The following container is being used:
+              </p>
+              <p className="mt-2 text-sm leading-6 text-white-600 italic">
+                {CONTAINER_URL}
               </p>
 
               <div className="mt-4 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">

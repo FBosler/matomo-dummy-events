@@ -1,6 +1,8 @@
 import { Inter } from 'next/font/google'
 import { useEffect, useState, ChangeEvent, FormEvent } from 'react'
 import Script from 'next/script'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -9,26 +11,70 @@ type FormData = {
   eventPayload: string
 }
 
-declare const window: Window & { _mtm: any };
+declare const window: Window & { _mtm: any }
 
-const CONTAINER_URL = "https://cdn.matomo.cloud/clinlife.matomo.cloud/container_kIEjXUNc_dev_ee672b1b1fdd94494976a6ce.js"
+const CONTAINER_URL =
+  'https://cdn.matomo.cloud/clinlife.matomo.cloud/container_kIEjXUNc_dev_ee672b1b1fdd94494976a6ce.js'
 
 export default function Home() {
-  const [eventName, setEventName] = useState('')
-  const [eventPayload, setEventPayload] = useState('')
+  const [eventName, setEventName] = useState('Pageview')
+  const [eventPayload, setEventPayload] = useState('{"indication":"cough"}')
 
   const handleSubmit = async (
     event: FormEvent<HTMLFormElement>,
     formData: FormData
   ) => {
     event.preventDefault()
-    
-    if (window && window._mtm) {
-      window._mtm = window._mtm || [];
-      window._mtm.push({'event': formData.eventName, ...JSON.parse(eventPayload)});
-      setEventName("")
-      setEventPayload("")
+
+    let eventDetails = {event: formData.eventName}
+    try {
+      eventDetails = {...eventDetails, ...JSON.parse(eventPayload)}
+    } catch (error) {
+      console.log(error)
     }
+
+    if (!eventDetails.event ) {
+      toast.error(
+        <div>
+          No event name provided. Please add an event name.
+        </div>, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        })
+        return
+    }
+
+    if (window && window._mtm) {
+      window._mtm = window._mtm || []
+      window._mtm.push(eventDetails)
+      setEventName('')
+      setEventPayload('')
+    }
+
+    toast.success(
+      <div>
+        <p className='mb-1'> 
+        Submitted: {JSON.stringify(eventDetails)}
+        </p>
+        <p> 
+        You can check window._mtm to make sure event was pushed
+        </p>
+      </div>, {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+      })
   }
 
   return (
@@ -76,7 +122,7 @@ export default function Home() {
                         id="eventName"
                         autoComplete="eventName"
                         className="block w-full border-0 bg-transparent py-1.5 pl-1 text-white-900 placeholder:text-white-400 focus:ring-0 sm:text-sm sm:leading-6"
-                        placeholder="pageView"
+                        placeholder="Pageview"
                         value={eventName}
                         onChange={(e: ChangeEvent<HTMLInputElement>) => {
                           const { value } = e.target
@@ -100,9 +146,9 @@ export default function Home() {
                       name="about"
                       rows={3}
                       className="block w-full rounded-md border-0 bg-transparent py-1.5 text-white-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-white-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                      placeholder="{
-                        'indication':'cough'
-                      }"
+                      placeholder='{
+                        "indication":"cough"
+                      }'
                       value={eventPayload}
                       onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
                         const { value } = e.target
@@ -123,6 +169,7 @@ export default function Home() {
             </button>
           </div>
         </form>
+        <ToastContainer />
       </main>
     </>
   )
